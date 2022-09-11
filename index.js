@@ -55,7 +55,7 @@
 
         setTimeout(() => {
           window.requestAnimationFrame(game.playGame);
-        }, 1000 / fps);
+        }, 1000 / game.fps);
 
         if (player.gameStarted) {
           if (keys.ArrowUp && player.y > -1) {
