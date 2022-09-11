@@ -194,7 +194,7 @@
         cat.classList.add("take-damage");
         player.girth -= game.dogDamage;
         bark.play();
-        bar = null;
+        bark = null;
         const takeDamage = setTimeout(() => {
           cat.classList.remove("take-damage");
         }, 400);
