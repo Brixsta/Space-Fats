@@ -198,8 +198,6 @@
         const takeDamage = setTimeout(() => {
           cat.classList.remove("take-damage");
         }, 400);
-
-        clearTimeout(takeDamage);
       }
 
       if (item.x > 650) {
@@ -265,8 +263,6 @@
         const takeDamage = setTimeout(() => {
           cat.classList.remove("take-damage");
         }, 400);
-
-        clearTimeout(takeDamage);
       }
 
       if (item.y >= 700) {
