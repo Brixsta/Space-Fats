@@ -7,6 +7,13 @@
   const gameTitle = document.querySelector(".game-title");
   let thermal = new Audio("audio/thermal.wav");
 
+  alert(window.innerHeight);
+
+  if (window.innerHeight < 700) {
+    alert("This is a browser only game");
+    return;
+  }
+
   const player = {
     x: 20,
     y: 220,
@@ -91,7 +98,7 @@
   };
 
   let isCollide = (item) => {
-    let cat = document.querySelector(".cat");
+    let cat = game.cat[0];
     let catRect = cat.getBoundingClientRect();
     let itemRect = item.getBoundingClientRect();
     return !(
