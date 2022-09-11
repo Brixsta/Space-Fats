@@ -37,11 +37,11 @@
           return;
         }
         decrementGirth();
-        moveMice(cat);
+        moveMice();
         moveFleas();
 
         if (player.score > 2000) {
-          moveDog(cat);
+          moveDog();
         }
 
         incrementScore();
