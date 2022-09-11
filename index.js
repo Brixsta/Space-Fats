@@ -18,17 +18,20 @@
   };
 
   const game = {
+    dog: [],
+    cat: [],
+    fleas: [],
+    mice: [],
     foodSpeed: 5,
     fleaSpeed: 5,
     fleaDamage: 30,
     dogSpeed: 5,
     dogDamage: 60,
     playGame() {
+      let cat = game.cat[0];
       document.addEventListener("keydown", keyPress);
       document.addEventListener("keyup", keyRelease);
       if (player.gameStarted) {
-        const cat = document.querySelector(".cat");
-
         if (player.girth <= 0) {
           const meter = document.querySelector(".meter");
           player.girth = 0;
@@ -38,11 +41,8 @@
         }
         decrementGirth();
         moveMice();
+        moveDog();
         moveFleas();
-
-        if (player.score > 2000) {
-          moveDog();
-        }
 
         incrementScore();
         const canvasRect = canvas.getBoundingClientRect();
@@ -68,9 +68,12 @@
     },
     startGame() {
       generateLensFlare();
+      setTimeout(generateLensFlare, 500);
       const cat = document.createElement("div");
-      thermal = new Audio("audio/thermal.wav");
       cat.classList.add("cat");
+      game.cat.push(cat);
+      canvas.appendChild(cat);
+      thermal = new Audio("audio/thermal.wav");
       thermal.play();
       thermal.loop = true;
       thermal.volume = 0.03;
@@ -78,7 +81,6 @@
       generateDog();
       generateMice();
       generateFleas();
-      canvas.appendChild(cat);
       metrics.classList.remove("hidden");
       window.requestAnimationFrame(game.playGame);
       canvas.classList.remove("hidden");
@@ -101,12 +103,13 @@
   };
 
   const gameOver = () => {
-    const oldCat = document.querySelector(".cat");
+    const oldCat = game.cat[0];
+    oldCat.remove();
     const lensFlares = document.querySelectorAll(".lens-flare");
     lensFlares.forEach((item) => {
       item.remove();
     });
-    oldCat.remove();
+
     thermal.pause();
     thermal = null;
     let gameOverContainer = document.createElement("div");
@@ -136,30 +139,32 @@
     const score = document.querySelector(".score");
     const cat = document.createElement("div");
     cat.classList.add("cat");
-
-    score.innerHTML = 0;
-    player.score = 0;
+    game.cat.push(cat);
     cat.style.left = 200 + "px";
     cat.style.top = 610 + "px";
+    player.gameStarted = true;
+    score.innerHTML = 0;
+    player.score = 0;
+
     player.girth = 100;
     meter.style.width = player.girth + "%";
-    let mice = document.querySelectorAll(".mouse");
-    let fleas = document.querySelectorAll(".flea");
-    let dogs = document.querySelectorAll(".dog");
+    let mice = game.mice;
+    let fleas = game.fleas;
+    let dog = game.dog[0];
     let gameOverContainer = document.querySelector(".game-over-container");
 
     gameOverContainer.remove();
-
     mice.forEach((item) => {
       item.remove();
     });
     fleas.forEach((item) => {
       item.remove();
     });
-    dogs.forEach((item) => {
-      item.remove();
-    });
-
+    dog.remove();
+    game.cat = [];
+    game.mice = [];
+    game.fleas = [];
+    game.dog = [];
     game.startGame();
   };
 
@@ -183,40 +188,37 @@
   let moveDog = () => {
     let bark = new Audio("audio/bark.wav");
     bark.volume = 0.1;
-    let dogs = document.querySelectorAll(".dog");
+    let dog = game.dog[0];
 
-    dogs.forEach((item) => {
-      item.x += game.dogSpeed;
+    if (isCollide(dog)) {
+      let cat = game.cat[0];
+      dog.classList.add("hidden");
+      cat.classList.add("take-damage");
+      player.girth -= game.dogDamage;
+      bark.play();
+      bark = null;
+      const takeDamage = setTimeout(() => {
+        cat.classList.remove("take-damage");
+      }, 400);
+    }
 
-      if (isCollide(item)) {
-        let cat = document.querySelector(".cat");
-        item.classList.add("hidden");
-        cat.classList.add("take-damage");
-        player.girth -= game.dogDamage;
-        bark.play();
-        bark = null;
-        const takeDamage = setTimeout(() => {
-          cat.classList.remove("take-damage");
-        }, 400);
-      }
+    if (dog.x > 650) {
+      dog.classList.remove("hidden");
+      dog.x = -150;
+      dog.y = Math.floor(Math.random() * 600);
+    }
 
-      if (item.x > 650) {
-        item.classList.remove("hidden");
-        item.x = -150;
-        item.y = Math.floor(Math.random() * 600);
-      }
+    dog.x += game.dogSpeed;
 
-      item.style.left = item.x + "px";
-      item.style.top = item.y + "px";
-    });
-    dogs = null;
+    dog.style.left = dog.x + "px";
+    dog.style.top = dog.y + "px";
+    bark = null;
   };
 
   let moveMice = () => {
     let munch = new Audio("audio/munch.m4a");
     munch.volume = 0.03;
-    let mice = document.querySelectorAll(".mouse");
-
+    let mice = game.mice;
     mice.forEach((item) => {
       if (item.style.backgroundImage === "") {
         item.style.backgroundImage = `url(images/mouse.png)`;
@@ -250,11 +252,11 @@
   let moveFleas = () => {
     let smack = new Audio("audio/smacked.wav");
     smack.volume = 0.1;
-    let fleas = document.querySelectorAll(".flea");
+    let fleas = game.fleas;
 
     fleas.forEach((item) => {
       if (isCollide(item)) {
-        let cat = document.querySelector(".cat");
+        let cat = game.cat[0];
         cat.classList.add("take-damage");
         smack.play();
         item.classList.add("hidden");
@@ -279,61 +281,62 @@
   };
 
   const generateLensFlare = () => {
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 10; i++) {
       let lensFlare = document.createElement("div");
       lensFlare.classList.add("lens-flare");
       canvas.appendChild(lensFlare);
       lensFlare.style.top = Math.floor(Math.random() * 650) + "px";
       lensFlare.style.left = Math.floor(Math.random() * 450) + "px";
     }
-
-    let lensFlares = document.querySelectorAll(".lens-flare");
   };
 
   const generateMice = () => {
     for (let i = 1; i < 8; i++) {
       let mouse = document.createElement("div");
       mouse.classList.add("mouse");
-      canvas.appendChild(mouse);
       mouse.y = i * -100;
       mouse.x = Math.floor(Math.random() * 450);
       mouse.style.top = mouse.y + "px";
       mouse.style.left = mouse.x + "px";
+      game.mice.push(mouse);
+      canvas.appendChild(mouse);
     }
   };
 
-  const generateBirds = () => {
-    for (let i = 1; i < 8; i++) {
-      let bird = document.createElement("div");
-      bird.classList.add("bird");
-      canvas.appendChild(bird);
-      bird.y = i * -400;
-      bird.x = Math.floor(Math.random() * 450);
-      bird.style.top = bird.y + "px";
-      bird.style.left = bird.x + "px";
-    }
-  };
+  // const generateBirds = () => {
+  //   for (let i = 1; i < 8; i++) {
+  //     let bird = document.createElement("div");
+  //     bird.classList.add("bird");
+  //     canvas.appendChild(bird);
+  //     bird.y = i * -400;
+  //     bird.x = Math.floor(Math.random() * 450);
+  //     bird.style.top = bird.y + "px";
+  //     bird.style.left = bird.x + "px";
+  //   }
+  // };
 
   const generateFleas = () => {
     for (let i = 1; i < 6; i++) {
       let flea = document.createElement("div");
       flea.classList.add("flea");
-      canvas.appendChild(flea);
       flea.y = -225 * i;
       flea.x = Math.floor(Math.random() * 300);
       flea.style.top = flea.y + "px";
       flea.style.left = flea.x + "px";
+      game.fleas.push(flea);
+      canvas.appendChild(flea);
     }
   };
 
   const generateDog = () => {
     let dog = document.createElement("div");
     dog.classList.add("dog");
-    canvas.appendChild(dog);
     dog.x = -150;
     dog.y = Math.floor(Math.random() * 500);
     dog.style.top = dog.y + "px";
     dog.style.left = dog.x + "px";
+    game.dog.push(dog);
+    canvas.appendChild(dog);
   };
 
   const hideStartMenu = () => {

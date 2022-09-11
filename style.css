@@ -113,7 +113,7 @@ h1 {
 
 .cat {
   position: absolute;
-  z-index: 100;
+  z-index: 2000;
   top: 610px;
   left: 200px;
   height: 60px;
@@ -124,6 +124,7 @@ h1 {
 }
 
 .mouse {
+  z-index: 1000;
   height: 50px;
   width: 60px;
   position: absolute;
@@ -222,6 +223,7 @@ h1 {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  z-index: 1000;
 }
 
 .dog {
@@ -231,6 +233,7 @@ h1 {
   background-image: url("images/dog.png");
   background-size: contain;
   background-position: center;
+  z-index: 1000;
 }
 
 .bird {
