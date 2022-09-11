@@ -7,10 +7,8 @@
   const gameTitle = document.querySelector(".game-title");
   let thermal = new Audio("audio/thermal.wav");
 
-  alert(window.innerHeight);
-
-  if (window.innerHeight < 700) {
-    alert("This is a browser only game");
+  if (window.innerHeight < 730 || window.innerWidth < 1055) {
+    alert("This is a browser only game Sorry ;P");
     return;
   }
 
