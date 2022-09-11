@@ -32,7 +32,7 @@
     fleaDamage: 30,
     dogSpeed: 5,
     dogDamage: 60,
-    fps: 60,
+    fps: 100,
     playGame() {
       let cat = game.cat[0];
       document.addEventListener("keydown", keyPress);
