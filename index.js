@@ -32,6 +32,7 @@
     fleaDamage: 30,
     dogSpeed: 5,
     dogDamage: 60,
+    fps: 60,
     playGame() {
       let cat = game.cat[0];
       document.addEventListener("keydown", keyPress);
@@ -51,7 +52,11 @@
 
         incrementScore();
         const canvasRect = canvas.getBoundingClientRect();
-        window.requestAnimationFrame(game.playGame);
+
+        setTimeout(() => {
+          window.requestAnimationFrame(game.playGame);
+        }, 1000 / fps);
+
         if (player.gameStarted) {
           if (keys.ArrowUp && player.y > -1) {
             player.y -= player.speedY;
