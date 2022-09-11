@@ -5,9 +5,7 @@ const metrics = document.querySelector(".metrics");
 const gameArea = document.querySelector(".game-area");
 const gameTitle = document.querySelector(".game-title");
 const playAgainButton = document.querySelector(".play-again-button");
-let thermal = new Audio("thermal.wav");
-
-console.log(window.requestAnimationFrame);
+let thermal = new Audio("audio/thermal.wav");
 
 const player = {
   x: 20,
@@ -68,7 +66,7 @@ const game = {
   startGame() {
     generateLensFlare();
     const cat = document.createElement("div");
-    thermal = new Audio("thermal.wav");
+    thermal = new Audio("audio/thermal.wav");
     cat.classList.add("cat");
     thermal.play();
     thermal.loop = true;
@@ -181,7 +179,7 @@ const decrementGirth = () => {
 };
 
 let moveDog = () => {
-  let bark = new Audio("bark.wav");
+  let bark = new Audio("audio/bark.wav");
   bark.volume = 0.1;
   let dogs = document.querySelectorAll(".dog");
 
@@ -213,13 +211,13 @@ let moveDog = () => {
 };
 
 let moveMice = () => {
-  let munch = new Audio("munch.m4a");
+  let munch = new Audio("audio/munch.m4a");
   munch.volume = 0.03;
   let mice = document.querySelectorAll(".mouse");
 
   mice.forEach((item) => {
     if (item.style.backgroundImage === "") {
-      item.style.backgroundImage = `url(mouse.png)`;
+      item.style.backgroundImage = `url(images/mouse.png)`;
     }
 
     if (isCollide(item)) {
@@ -248,7 +246,7 @@ let moveMice = () => {
 };
 
 let moveFleas = () => {
-  let smack = new Audio("smacked.wav");
+  let smack = new Audio("audio/smacked.wav");
   smack.volume = 0.1;
   let fleas = document.querySelectorAll(".flea");
 
