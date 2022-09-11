@@ -1,3 +1,4 @@
+"use strict";
 (function () {
   const fatsSplash = document.querySelector(".fats-splash");
   const fatsSplashContainer = document.querySelector(".fats-splash-container");
@@ -279,14 +280,11 @@
 
     fleas = null;
     smack = null;
-    delete fleas;
-    delete smack;
   };
 
   const generateLensFlare = () => {
     for (let i = 0; i < 3; i++) {
       let lensFlare = document.createElement("div");
-      index = i;
       lensFlare.classList.add("lens-flare");
       canvas.appendChild(lensFlare);
       lensFlare.style.top = Math.floor(Math.random() * 650) + "px";
