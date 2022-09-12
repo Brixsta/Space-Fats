@@ -85,6 +85,8 @@
       }
     },
     startGame() {
+      document.addEventListener("keydown", keyPress);
+      document.addEventListener("keyup", keyRelease);
       thermal = new Audio("audio/thermal.wav");
       thermal.play();
       thermal.loop = true;
@@ -96,11 +98,18 @@
       game.countDown();
       hideStartMenu();
       metrics.classList.remove("hidden");
-
       canvas.classList.remove("hidden");
-      player.gameStarted = true;
+
       player.x = cat.offsetLeft;
       player.y = cat.offsetTop;
+      player.gameStarted = true;
+
+      setTimeout(() => {
+        game.initializeGame();
+      }, 2700);
+    },
+    initializeGame() {
+      window.requestAnimationFrame(game.playGame);
     },
     countDown() {
       const beep = new Audio("audio/beep.m4a");
@@ -129,14 +138,11 @@
         countDownMeter.innerHTML = `${game.countDownNum}`;
       }, 1800);
       setTimeout(() => {
-        window.requestAnimationFrame(game.playGame);
         game.countDownNum--;
         countDownMeter.innerHTML = `${game.countDownNum}`;
         countDownContainer.remove();
         generateLensFlare();
         setTimeout(generateLensFlare, 500);
-        document.addEventListener("keydown", keyPress);
-        document.addEventListener("keyup", keyRelease);
         generateBirds(3);
         generateFleas(5);
         generateDog();
