@@ -5,7 +5,7 @@
   const canvas = document.querySelector(".canvas");
   const metrics = document.querySelector(".metrics");
   const gameTitle = document.querySelector(".game-title");
-  let thermal = new Audio("audio/thermal.wav");
+  const thermal = new Audio("audio/thermal.wav");
 
   if (window.innerHeight < 730 || window.innerWidth < 1055) {
     alert("This is a browser only game Sorry ;P");
@@ -23,6 +23,7 @@
   };
 
   const game = {
+    song: [thermal],
     countDownNum: 3,
     animalId: 0,
     cat: [],
@@ -87,10 +88,9 @@
     startGame() {
       document.addEventListener("keydown", keyPress);
       document.addEventListener("keyup", keyRelease);
-      thermal = new Audio("audio/thermal.wav");
-      thermal.play();
-      thermal.loop = true;
-      thermal.volume = 0.03;
+      game.song[0].play();
+      game.song[0].loop = true;
+      game.song[0].volume = 0.03;
       const cat = document.createElement("div");
       cat.classList.add("cat");
       game.cat.push(cat);
@@ -163,8 +163,8 @@
   };
 
   const gameOver = () => {
-    thermal.pause();
-    thermal = null;
+    game.song[0].pause();
+    game.song[0].currentTime = 0;
     let cat = game.cat[0];
     let dog = game.dog[0];
     let birds = Object.values(game.birds);
