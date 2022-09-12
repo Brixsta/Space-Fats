@@ -86,6 +86,8 @@
       }
     },
     startGame() {
+      document.removeEventListener("keydown", keyPress);
+      document.removeEventListener("keyup", keyRelease);
       document.addEventListener("keydown", keyPress);
       document.addEventListener("keyup", keyRelease);
       game.song[0].play();
@@ -186,7 +188,6 @@
     lensFlares.forEach((item) => {
       item.remove();
     });
-
     const gameOverContainer = document.createElement("div");
     const gameOverTitle = document.createElement("h1");
     const gameOverScoreTitle = document.createElement("h1");
@@ -205,7 +206,7 @@
     gameOverContainer.append(gameOverScoreTitle);
     gameOverContainer.append(playAgainContainer);
     canvas.appendChild(gameOverContainer);
-
+    playAgainButton.removeEventListener("click", restartGame);
     playAgainButton.addEventListener("click", restartGame);
   };
 
@@ -413,8 +414,9 @@
     fatsSplash.remove();
     fatsSplashContainer.remove();
   };
-
+  gameTitle.removeEventListener("click", game.startGame);
   gameTitle.addEventListener("click", game.startGame);
+
   const keys = {
     ArrowUp: false,
     ArrowDown: false,
