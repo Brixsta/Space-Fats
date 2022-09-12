@@ -7,10 +7,10 @@
   const gameTitle = document.querySelector(".game-title");
   let thermal = new Audio("audio/thermal.wav");
 
-  // if (window.innerHeight < 730 || window.innerWidth < 1055) {
-  //   alert("This is a browser only game Sorry ;P");
-  //   return;
-  // }
+  if (window.innerHeight < 730 || window.innerWidth < 1055) {
+    alert("This is a browser only game Sorry ;P");
+    return;
+  }
 
   const player = {
     x: 20,
@@ -23,6 +23,7 @@
   };
 
   const game = {
+    countDownNum: 3,
     animalId: 0,
     cat: [],
     dog: [],
@@ -36,14 +37,17 @@
     birdGirthAmt: 10,
     fps: 100,
     playGame() {
-      let cat = game.cat[0];
-      document.addEventListener("keydown", keyPress);
-      document.addEventListener("keyup", keyRelease);
+      const meow = new Audio("audio/meow.wav");
+      meow.volume = 0.02;
+      const cat = game.cat[0];
+
       if (player.gameStarted) {
         if (player.girth <= 0) {
           const meter = document.querySelector(".meter");
           player.girth = 0;
           meter.style.width = player.girth + "%";
+          meter.style.boxShadow = "0px 0px 0px 0px rgba(0, 106, 255, 0.5)";
+          meow.play();
           gameOver();
           return;
         }
@@ -81,26 +85,62 @@
       }
     },
     startGame() {
-      generateLensFlare();
-      setTimeout(generateLensFlare, 500);
-      const cat = document.createElement("div");
-      cat.classList.add("cat");
-      game.cat.push(cat);
-      canvas.appendChild(cat);
       thermal = new Audio("audio/thermal.wav");
       thermal.play();
       thermal.loop = true;
       thermal.volume = 0.03;
+      const cat = document.createElement("div");
+      cat.classList.add("cat");
+      game.cat.push(cat);
+      canvas.appendChild(cat);
+      game.countDown();
       hideStartMenu();
-      generateBirds(7);
-      generateFleas(5);
-      generateDog();
       metrics.classList.remove("hidden");
-      window.requestAnimationFrame(game.playGame);
+
       canvas.classList.remove("hidden");
       player.gameStarted = true;
       player.x = cat.offsetLeft;
       player.y = cat.offsetTop;
+    },
+    countDown() {
+      let beep = new Audio("audio/beep.m4a");
+      beep.volume = 0.02;
+      beep.play();
+      let countDownContainer = document.createElement("div");
+      let countDownContainerTitle = document.createElement("h1");
+      let countDownMeter = document.createElement("h1");
+      countDownMeter.classList.add("count-down-meter");
+      countDownMeter.innerHTML = `${game.countDownNum}`;
+      countDownContainerTitle.classList.add("count-down-container-title");
+      countDownContainerTitle.innerHTML = `Starting Game..`;
+      countDownContainer.classList.add("count-down-container");
+      countDownContainer.append(countDownContainerTitle);
+      countDownContainer.append(countDownMeter);
+      canvas.append(countDownContainer);
+
+      setTimeout(() => {
+        game.countDownNum--;
+        beep.play();
+        countDownMeter.innerHTML = `${game.countDownNum}`;
+      }, 900);
+      setTimeout(() => {
+        game.countDownNum--;
+        beep.play();
+        countDownMeter.innerHTML = `${game.countDownNum}`;
+      }, 1800);
+      setTimeout(() => {
+        window.requestAnimationFrame(game.playGame);
+        game.countDownNum--;
+        countDownMeter.innerHTML = `${game.countDownNum}`;
+        countDownContainer.remove();
+        generateLensFlare();
+        setTimeout(generateLensFlare, 500);
+        document.addEventListener("keydown", keyPress);
+        document.addEventListener("keyup", keyRelease);
+        generateBirds(3);
+        generateFleas(5);
+        generateDog();
+      }, 2700);
     },
   };
 
@@ -166,12 +206,14 @@
   const restartGame = () => {
     const meter = document.querySelector(".meter");
     const score = document.querySelector(".score");
+    const gameOverContainer = document.querySelector(".game-over-container");
     player.gameStarted = true;
     score.innerHTML = 0;
     player.score = 0;
     player.girth = 90;
+    game.countDownNum = 3;
     meter.style.width = player.girth + "%";
-    let gameOverContainer = document.querySelector(".game-over-container");
+    meter.style.boxShadow = "0px 0px 3px 3px rgba(0, 106, 255, 0.5)";
     gameOverContainer.remove();
     game.startGame();
   };
@@ -188,9 +230,6 @@
     const meter = document.querySelector(".meter");
     player.girth -= 0.25;
     meter.style.width = player.girth + "%";
-
-    if (player.girth <= 0) {
-    }
   };
 
   const moveBirds = () => {
@@ -232,7 +271,7 @@
   };
 
   const moveFleas = () => {
-    let fleas = Object.values(game.fleas);
+    const fleas = Object.values(game.fleas);
     let collision = false;
     let offScreen = false;
     fleas.forEach((item) => {
@@ -276,8 +315,8 @@
   };
 
   const moveDog = () => {
-    let cat = game.cat[0];
-    let dog = game.dog[0];
+    const cat = game.cat[0];
+    const dog = game.dog[0];
     let offScreen = false;
     let collision = false;
     const bark = new Audio("audio/bark.wav");
