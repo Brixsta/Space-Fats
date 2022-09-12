@@ -256,6 +256,7 @@ h1 {
   color: white;
   background-color: inherit;
   transition: all ease-in-out 0.1s;
+  user-select: none;
 }
 
 .play-again-button:hover {

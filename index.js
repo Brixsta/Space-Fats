@@ -103,12 +103,12 @@
       player.y = cat.offsetTop;
     },
     countDown() {
-      let beep = new Audio("audio/beep.m4a");
+      const beep = new Audio("audio/beep.m4a");
       beep.volume = 0.02;
       beep.play();
-      let countDownContainer = document.createElement("div");
-      let countDownContainerTitle = document.createElement("h1");
-      let countDownMeter = document.createElement("h1");
+      const countDownContainer = document.createElement("div");
+      const countDownContainerTitle = document.createElement("h1");
+      const countDownMeter = document.createElement("h1");
       countDownMeter.classList.add("count-down-meter");
       countDownMeter.innerHTML = `${game.countDownNum}`;
       countDownContainerTitle.classList.add("count-down-container-title");
@@ -157,6 +157,8 @@
   };
 
   const gameOver = () => {
+    thermal.pause();
+    thermal = null;
     let cat = game.cat[0];
     let dog = game.dog[0];
     let birds = Object.values(game.birds);
@@ -179,8 +181,6 @@
       item.remove();
     });
 
-    thermal.pause();
-    thermal = null;
     const gameOverContainer = document.createElement("div");
     const gameOverTitle = document.createElement("h1");
     const gameOverScoreTitle = document.createElement("h1");
@@ -378,7 +378,7 @@
 
   const generateFleas = (amt) => {
     for (let i = 1; i <= amt; i++) {
-      let flea = document.createElement("div");
+      const flea = document.createElement("div");
       flea.x = Math.floor(Math.random() * 460);
       flea.y = -150 * i;
       flea.id = game.animalId;
@@ -392,7 +392,7 @@
   };
 
   const generateDog = () => {
-    let dog = document.createElement("div");
+    const dog = document.createElement("div");
     dog.classList.add("dog");
     dog.x = -500;
     dog.y = Math.floor(Math.random() * 500);
