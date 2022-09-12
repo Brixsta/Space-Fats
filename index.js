@@ -7,10 +7,10 @@
   const gameTitle = document.querySelector(".game-title");
   let thermal = new Audio("audio/thermal.wav");
 
-  if (window.innerHeight < 730 || window.innerWidth < 1055) {
-    alert("This is a browser only game Sorry ;P");
-    return;
-  }
+  // if (window.innerHeight < 730 || window.innerWidth < 1055) {
+  //   alert("This is a browser only game Sorry ;P");
+  //   return;
+  // }
 
   const player = {
     x: 20,
@@ -23,15 +23,17 @@
   };
 
   const game = {
-    dog: [],
+    animalId: 0,
     cat: [],
-    fleas: [],
-    mice: [],
-    foodSpeed: 5,
-    fleaSpeed: 5,
-    fleaDamage: 30,
+    dog: [],
     dogSpeed: 5,
-    dogDamage: 60,
+    dogDamage: 35,
+    birds: {},
+    birdSpeed: 5,
+    fleas: {},
+    fleaSpeed: 6,
+    fleaDamage: 25,
+    birdGirthAmt: 10,
     fps: 100,
     playGame() {
       let cat = game.cat[0];
@@ -46,9 +48,11 @@
           return;
         }
         decrementGirth();
-        moveMice();
-        moveDog();
         moveFleas();
+        moveBirds();
+        if (player.score >= 1000) {
+          moveDog();
+        }
 
         incrementScore();
         const canvasRect = canvas.getBoundingClientRect();
@@ -88,9 +92,9 @@
       thermal.loop = true;
       thermal.volume = 0.03;
       hideStartMenu();
+      generateBirds(7);
+      generateFleas(5);
       generateDog();
-      generateMice();
-      generateFleas();
       metrics.classList.remove("hidden");
       window.requestAnimationFrame(game.playGame);
       canvas.classList.remove("hidden");
@@ -113,20 +117,35 @@
   };
 
   const gameOver = () => {
-    const oldCat = game.cat[0];
-    oldCat.remove();
+    let cat = game.cat[0];
+    let dog = game.dog[0];
+    let birds = Object.values(game.birds);
+    let fleas = Object.values(game.fleas);
     const lensFlares = document.querySelectorAll(".lens-flare");
+    game.animalId = 0;
+    game.cat = [];
+    game.dog = [];
+    game.birds = {};
+    game.fleas = {};
+    dog.remove();
+    cat.remove();
+    birds.forEach((item) => {
+      item.remove();
+    });
+    fleas.forEach((item) => {
+      item.remove();
+    });
     lensFlares.forEach((item) => {
       item.remove();
     });
 
     thermal.pause();
     thermal = null;
-    let gameOverContainer = document.createElement("div");
-    let gameOverTitle = document.createElement("h1");
-    let gameOverScoreTitle = document.createElement("h1");
-    let playAgainContainer = document.createElement("div");
-    let playAgainButton = document.createElement("button");
+    const gameOverContainer = document.createElement("div");
+    const gameOverTitle = document.createElement("h1");
+    const gameOverScoreTitle = document.createElement("h1");
+    const playAgainContainer = document.createElement("div");
+    const playAgainButton = document.createElement("button");
     playAgainButton.innerHTML = "Play Again";
     playAgainButton.classList.add("play-again-button");
     playAgainContainer.append(playAgainButton);
@@ -147,34 +166,13 @@
   const restartGame = () => {
     const meter = document.querySelector(".meter");
     const score = document.querySelector(".score");
-    const cat = document.createElement("div");
-    cat.classList.add("cat");
-    game.cat.push(cat);
-    cat.style.left = 200 + "px";
-    cat.style.top = 610 + "px";
     player.gameStarted = true;
     score.innerHTML = 0;
     player.score = 0;
-
-    player.girth = 100;
+    player.girth = 90;
     meter.style.width = player.girth + "%";
-    let mice = game.mice;
-    let fleas = game.fleas;
-    let dog = game.dog[0];
     let gameOverContainer = document.querySelector(".game-over-container");
-
     gameOverContainer.remove();
-    mice.forEach((item) => {
-      item.remove();
-    });
-    fleas.forEach((item) => {
-      item.remove();
-    });
-    dog.remove();
-    game.cat = [];
-    game.mice = [];
-    game.fleas = [];
-    game.dog = [];
     game.startGame();
   };
 
@@ -195,99 +193,123 @@
     }
   };
 
-  let moveDog = () => {
-    let bark = new Audio("audio/bark.wav");
-    bark.volume = 0.1;
+  const moveBirds = () => {
+    let collision = false;
+    let offScreen = false;
+    let birds = Object.values(game.birds);
+
+    birds.forEach((item) => {
+      item.y += game.birdSpeed;
+      item.style.top = item.y + "px";
+
+      if (isCollide(item)) {
+        let munch = new Audio("audio/munch.m4a");
+        munch.volume = 0.03;
+        munch.play();
+
+        if (player.girth >= 90) {
+          player.girth = 90;
+        }
+        player.girth += game.birdGirthAmt;
+
+        if (collision === false) {
+          collision = true;
+          item.remove();
+          delete game.birds[item.id];
+          generateBirds(1);
+        }
+      }
+
+      if (item.y >= 700) {
+        if (offScreen === false) {
+          offScreen = true;
+          item.remove();
+          delete game.birds[item.id];
+          generateBirds(1);
+        }
+      }
+    });
+  };
+
+  const moveFleas = () => {
+    let fleas = Object.values(game.fleas);
+    let collision = false;
+    let offScreen = false;
+    fleas.forEach((item) => {
+      item.y += game.fleaSpeed;
+      item.style.top = item.y + "px";
+
+      if (isCollide(item)) {
+        let cat = game.cat[0];
+        let smacked = new Audio("audio/smacked.wav");
+        smacked.volume = 0.1;
+        smacked.play();
+
+        cat.classList.add("take-damage");
+
+        setTimeout(() => {
+          cat.classList.remove("take-damage");
+        }, 400);
+
+        if (player.girth >= 90) {
+          player.girth = 90;
+        }
+        player.girth -= game.fleaDamage;
+
+        if (collision === false) {
+          collision = true;
+          item.remove();
+          delete game.fleas[item.id];
+          generateFleas(1);
+        }
+      }
+
+      if (item.y >= 700) {
+        if (offScreen === false) {
+          offScreen = true;
+          item.remove();
+          delete game.fleas[item.id];
+          generateFleas(1);
+        }
+      }
+    });
+  };
+
+  const moveDog = () => {
+    let cat = game.cat[0];
     let dog = game.dog[0];
-
-    if (isCollide(dog)) {
-      let cat = game.cat[0];
-      dog.classList.add("hidden");
-      cat.classList.add("take-damage");
-      player.girth -= game.dogDamage;
-      bark.play();
-      bark = null;
-      const takeDamage = setTimeout(() => {
-        cat.classList.remove("take-damage");
-      }, 400);
-    }
-
-    if (dog.x > 650) {
-      dog.classList.remove("hidden");
-      dog.x = -150;
-      dog.y = Math.floor(Math.random() * 600);
-    }
+    let offScreen = false;
+    let collision = false;
+    const bark = new Audio("audio/bark.wav");
 
     dog.x += game.dogSpeed;
 
-    dog.style.left = dog.x + "px";
-    dog.style.top = dog.y + "px";
-    bark = null;
-  };
-
-  let moveMice = () => {
-    let munch = new Audio("audio/munch.m4a");
-    munch.volume = 0.03;
-    let mice = game.mice;
-    mice.forEach((item) => {
-      if (item.style.backgroundImage === "") {
-        item.style.backgroundImage = `url(images/mouse.png)`;
-      }
-
-      if (isCollide(item)) {
-        munch.play();
-        item.classList.add("hidden");
-        let girthIncrease = 10;
-
-        if (player.girth + girthIncrease > 100) {
-          player.girth = 100;
-        } else {
-          player.girth += girthIncrease;
-        }
-      }
-      if (item.y >= 700) {
-        item.style.backgroundImage = "";
-        item.classList.remove("hidden");
-        item.y = -150;
-        item.style.left = Math.floor(Math.random() * 350) + "px";
-      }
-
-      item.y += game.foodSpeed;
-      item.style.top = item.y + "px";
-    });
-    mice = null;
-    munch = null;
-  };
-
-  let moveFleas = () => {
-    let smack = new Audio("audio/smacked.wav");
-    smack.volume = 0.1;
-    let fleas = game.fleas;
-
-    fleas.forEach((item) => {
-      if (isCollide(item)) {
-        let cat = game.cat[0];
+    if (isCollide(dog)) {
+      if (collision === false) {
         cat.classList.add("take-damage");
-        smack.play();
-        item.classList.add("hidden");
-        player.girth -= game.fleaDamage;
-
-        const takeDamage = setTimeout(() => {
+        setTimeout(() => {
           cat.classList.remove("take-damage");
         }, 400);
+        bark.volume = 0.1;
+        bark.play();
+        collision = true;
+        player.girth -= game.dogDamage;
+        dog.remove();
+        game.dog = [];
+        generateDog();
       }
+    }
 
-      if (item.y >= 700) {
-        item.classList.remove("hidden");
-        item.y = -700;
+    if (dog.x >= 500) {
+      if (offScreen === false) {
+        offScreen = true;
+        dog.remove();
+        game.dog = [];
+        generateDog();
       }
+    }
 
-      item.y += game.fleaSpeed;
-      item.style.top = item.y + "px";
-    });
-
-    fleas = null;
-    smack = null;
+    dog.style.left = dog.x + "px";
   };
 
   const generateLensFlare = () => {
@@ -300,40 +322,32 @@
     }
   };
 
-  const generateMice = () => {
-    for (let i = 1; i < 8; i++) {
-      let mouse = document.createElement("div");
-      mouse.classList.add("mouse");
-      mouse.y = i * -100;
-      mouse.x = Math.floor(Math.random() * 450);
-      mouse.style.top = mouse.y + "px";
-      mouse.style.left = mouse.x + "px";
-      game.mice.push(mouse);
-      canvas.appendChild(mouse);
+  const generateBirds = (amt) => {
+    for (let i = 1; i <= amt; i++) {
+      let bird = document.createElement("div");
+      bird.x = Math.floor(Math.random() * 430);
+      bird.y = -150 * i;
+      bird.id = game.animalId;
+      game.animalId++;
+      bird.classList.add("bird");
+      bird.style.left = bird.x + "px";
+      bird.style.top = bird.y + "px";
+      game.birds[bird.id] = bird;
+      canvas.appendChild(bird);
     }
   };
 
-  // const generateBirds = () => {
-  //   for (let i = 1; i < 8; i++) {
-  //     let bird = document.createElement("div");
-  //     bird.classList.add("bird");
-  //     canvas.appendChild(bird);
-  //     bird.y = i * -400;
-  //     bird.x = Math.floor(Math.random() * 450);
-  //     bird.style.top = bird.y + "px";
-  //     bird.style.left = bird.x + "px";
-  //   }
-  // };
-
-  const generateFleas = () => {
-    for (let i = 1; i < 6; i++) {
+  const generateFleas = (amt) => {
+    for (let i = 1; i <= amt; i++) {
       let flea = document.createElement("div");
+      flea.x = Math.floor(Math.random() * 460);
+      flea.y = -150 * i;
+      flea.id = game.animalId;
+      game.animalId++;
       flea.classList.add("flea");
-      flea.y = -225 * i;
-      flea.x = Math.floor(Math.random() * 300);
-      flea.style.top = flea.y + "px";
       flea.style.left = flea.x + "px";
-      game.fleas.push(flea);
+      flea.style.top = flea.y + "px";
+      game.fleas[flea.id] = flea;
       canvas.appendChild(flea);
     }
   };
@@ -341,7 +355,7 @@
   const generateDog = () => {
     let dog = document.createElement("div");
     dog.classList.add("dog");
-    dog.x = -150;
+    dog.x = -500;
     dog.y = Math.floor(Math.random() * 500);
     dog.style.top = dog.y + "px";
     dog.style.left = dog.x + "px";

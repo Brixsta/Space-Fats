@@ -15,6 +15,17 @@ h1 {
   font-size: 30px;
 }
 
+.bird {
+  position: absolute;
+  height: 40px;
+  width: 70px;
+  background-image: url("images/bird.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1000;
+}
+
 .lens-flare {
   height: 30px;
   width: 30px;
@@ -123,20 +134,9 @@ h1 {
   left: 200px;
   height: 60px;
   width: 100px;
-  background-image: url("images/cat2.png");
+  background-image: url("images/cat.png");
   background-size: contain;
   background-repeat: no-repeat;
-}
-
-.mouse {
-  z-index: 1000;
-  height: 50px;
-  width: 60px;
-  position: absolute;
-  background-size: contain;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-image: url("images/mouse.png");
 }
 
 .game-over-container {
@@ -239,13 +239,6 @@ h1 {
   background-size: contain;
   background-position: center;
   z-index: 1000;
-}
-
-.bird {
-  height: 50px;
-  width: 50px;
-  background-color: yellow;
-  position: absolute;
 }
 
 .metrics {
