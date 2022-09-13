@@ -139,6 +139,9 @@
 
   const playGame = () => {
     let cat = game.cat;
+    let fleasTemp = moveFleas();
+    let birdsTemp = moveBirds();
+    let dogTemp = moveDog();
 
     if (player.gameStarted) {
       if (player.girth <= 0) {
@@ -155,10 +158,10 @@
         return;
       }
       decrementGirth();
-      moveFleas();
-      moveBirds();
-      if (player.score >= 1000) {
-        moveDog();
+      fleasTemp;
+      birdsTemp;
+      if (player.score >= 100) {
+        dogTemp;
       }
 
       incrementScore();
@@ -187,6 +190,9 @@
         canvasRect = null;
       }
     }
+    fleasTemp = null;
+    birdsTemp = null;
+    dogTemp = null;
     cat = null;
   };
 
@@ -408,7 +414,6 @@
         collision = true;
         player.girth -= game.dogDamage;
         dog.remove();
-        game.dog = null;
         generate;
         generate = null;
       }
@@ -423,6 +428,7 @@
       }
       cat = null;
       dog = null;
+      game.dog = null;
       offScreen = null;
       collision = null;
     }
