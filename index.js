@@ -1,10 +1,9 @@
 "use strict";
-
-let fatsSplash = document.querySelector(".fats-splash");
+let gameTitle = document.querySelector(".game-title");
 let fatsSplashContainer = document.querySelector(".fats-splash-container");
+let fatsSplash = document.querySelector(".fats-splash");
 const canvas = document.querySelector(".canvas");
 const metrics = document.querySelector(".metrics");
-let gameTitle = document.querySelector(".game-title");
 const thermal = new Audio("audio/thermal.wav");
 
 // if (window.innerHeight < 730 || window.innerWidth < 1055) {
@@ -26,8 +25,8 @@ const game = {
   song: [thermal],
   countDownNum: 3,
   animalId: 0,
-  cat: [],
-  dog: [],
+  cat: null,
+  dog: null,
   dogSpeed: 5,
   dogDamage: 35,
   birds: {},
@@ -56,15 +55,12 @@ const keyRelease = (e) => {
 document.addEventListener("keydown", keyPress);
 document.addEventListener("keyup", keyRelease);
 
-const isCollide = (item) => {
-  let cat = game.cat[0];
-  let catRect = cat.getBoundingClientRect();
-  let itemRect = item.getBoundingClientRect();
+const isCollide = (x, y) => {
   return !(
-    catRect.bottom < itemRect.top ||
-    catRect.top > itemRect.bottom ||
-    catRect.right < itemRect.left ||
-    catRect.left > itemRect.right
+    x.bottom < y.top ||
+    x.top > y.bottom ||
+    x.right < y.left ||
+    x.left > y.right
   );
 };
 
@@ -72,10 +68,11 @@ const startGame = () => {
   game.song[0].play();
   game.song[0].loop = true;
   game.song[0].volume = 0.03;
-  const cat = document.createElement("div");
+  let cat = document.createElement("div");
   cat.classList.add("cat");
-  game.cat.push(cat);
+  game.cat = cat;
   canvas.appendChild(cat);
+
   countDown();
   hideStartMenu();
   metrics.classList.remove("hidden");
@@ -87,6 +84,7 @@ const startGame = () => {
 
   setTimeout(() => {
     initializeGame();
+    cat = null;
   }, 2700);
 };
 
@@ -111,6 +109,7 @@ const countDown = () => {
     beep.play();
     countDownMeter.innerHTML = `${game.countDownNum}`;
   }, 900);
+
   setTimeout(() => {
     game.countDownNum--;
     beep.play();
@@ -139,16 +138,17 @@ const initializeGame = () => {
 const playGame = () => {
   const meow = new Audio("audio/meow.wav");
   meow.volume = 0.02;
-  const cat = game.cat[0];
+  let cat = game.cat;
 
   if (player.gameStarted) {
     if (player.girth <= 0) {
-      const meter = document.querySelector(".meter");
+      let meter = document.querySelector(".meter");
       player.girth = 0;
       meter.style.width = player.girth + "%";
       meter.style.boxShadow = "0px 0px 0px 0px rgba(0, 106, 255, 0.5)";
       meow.play();
       gameOver();
+      meter = null;
       return;
     }
     decrementGirth();
@@ -159,7 +159,7 @@ const playGame = () => {
     }
 
     incrementScore();
-    const canvasRect = canvas.getBoundingClientRect();
+    let canvasRect = canvas.getBoundingClientRect();
 
     setTimeout(() => {
       window.requestAnimationFrame(playGame);
@@ -181,21 +181,23 @@ const playGame = () => {
 
       cat.style.left = player.x + "px";
       cat.style.top = player.y + "px";
+      canvasRect = null;
     }
   }
+  cat = null;
 };
 
 const gameOver = () => {
   game.song[0].pause();
   game.song[0].currentTime = 0;
-  let cat = game.cat[0];
-  let dog = game.dog[0];
+  let cat = game.cat;
+  let dog = game.dog;
   let birds = Object.values(game.birds);
   let fleas = Object.values(game.fleas);
   const lensFlares = document.querySelectorAll(".lens-flare");
   game.animalId = 0;
-  game.cat = [];
-  game.dog = [];
+  game.cat = null;
+  game.dog = null;
   game.birds = {};
   game.fleas = {};
   dog.remove();
@@ -256,13 +258,15 @@ const incrementScore = () => {
     let score = document.querySelector(".score");
     player.score += 1;
     score.innerHTML = player.score;
+    score = null;
   }
 };
 
 const decrementGirth = () => {
-  const meter = document.querySelector(".meter");
+  let meter = document.querySelector(".meter");
   player.girth -= 0.25;
   meter.style.width = player.girth + "%";
+  meter = null;
 };
 
 const moveBirds = () => {
@@ -274,7 +278,9 @@ const moveBirds = () => {
     item.y += game.birdSpeed;
     item.style.top = item.y + "px";
 
-    if (isCollide(item)) {
+    if (
+      isCollide(game.cat.getBoundingClientRect(), item.getBoundingClientRect())
+    ) {
       let munch = new Audio("audio/munch.m4a");
       munch.volume = 0.03;
       munch.play();
@@ -301,18 +307,23 @@ const moveBirds = () => {
       }
     }
   });
+  birds = null;
+  offScreen = null;
+  collision = null;
 };
 
 const moveFleas = () => {
-  const fleas = Object.values(game.fleas);
+  let fleas = Object.values(game.fleas);
   let collision = false;
   let offScreen = false;
   fleas.forEach((item) => {
     item.y += game.fleaSpeed;
     item.style.top = item.y + "px";
 
-    if (isCollide(item)) {
-      let cat = game.cat[0];
+    if (
+      isCollide(game.cat.getBoundingClientRect(), item.getBoundingClientRect())
+    ) {
+      let cat = game.cat;
       let smacked = new Audio("audio/smacked.wav");
       smacked.volume = 0.1;
       smacked.play();
@@ -322,6 +333,7 @@ const moveFleas = () => {
 
       setTimeout(() => {
         cat.classList.remove("take-damage");
+        cat = null;
       }, 400);
 
       if (player.girth >= 90) {
@@ -346,17 +358,25 @@ const moveFleas = () => {
       }
     }
   });
+  fleas = null;
+  collision = null;
+  offScreen = null;
 };
 
 const moveDog = () => {
-  const cat = game.cat[0];
-  const dog = game.dog[0];
+  let cat = game.cat;
+  let dog = game.dog;
   let offScreen = false;
   let collision = false;
 
   dog.x += game.dogSpeed;
 
-  if (isCollide(dog)) {
+  if (
+    isCollide(
+      game.cat.getBoundingClientRect(),
+      game.dog.getBoundingClientRect()
+    )
+  ) {
     let bark = new Audio("audio/bark.wav");
     if (collision === false) {
       cat.classList.add("take-damage");
@@ -369,16 +389,20 @@ const moveDog = () => {
       collision = true;
       player.girth -= game.dogDamage;
       dog.remove();
-      game.dog = [];
+      game.dog = null;
       generateDog();
     }
   } else if (dog.x >= 500) {
     if (offScreen === false) {
       offScreen = true;
       dog.remove();
-      game.dog = [];
+      game.dog = null;
       generateDog();
     }
+    cat = null;
+    dog = null;
+    offScreen = null;
+    collision = null;
   }
 
   dog.style.left = dog.x + "px";
@@ -391,6 +415,7 @@ const generateLensFlare = () => {
     canvas.appendChild(lensFlare);
     lensFlare.style.top = Math.floor(Math.random() * 650) + "px";
     lensFlare.style.left = Math.floor(Math.random() * 450) + "px";
+    lensFlare = null;
   }
 };
 
@@ -433,8 +458,8 @@ const generateDog = () => {
   dog.y = Math.floor(Math.random() * 500);
   dog.style.top = dog.y + "px";
   dog.style.left = dog.x + "px";
-  game.dog.push(dog);
-  canvas.appendChild(game.dog[0]);
+  game.dog = dog;
+  canvas.appendChild(game.dog);
   dog = null;
 };
 
