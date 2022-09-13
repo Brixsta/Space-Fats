@@ -67,6 +67,8 @@
   };
 
   const startGame = () => {
+    let countdownTemp = countDown();
+    let hideStartMenuTemp = hideStartMenu();
     game.song[0].play();
     game.song[0].loop = true;
     game.song[0].volume = 0.03;
@@ -74,9 +76,10 @@
     cat.classList.add("cat");
     game.cat = cat;
     canvas.appendChild(cat);
-
-    countDown();
-    hideStartMenu();
+    countdownTemp;
+    countdownTemp = null;
+    hideStartMenuTemp;
+    hideStartMenuTemp = null;
     metrics.classList.remove("hidden");
     canvas.classList.remove("hidden");
 
@@ -134,7 +137,9 @@
   };
 
   const initializeGame = () => {
-    window.requestAnimationFrame(playGame);
+    let requestTemp = window.requestAnimationFrame(playGame);
+    requestTemp;
+    requestTemp = null;
   };
 
   const playGame = () => {
@@ -146,13 +151,15 @@
     if (player.gameStarted) {
       if (player.girth <= 0) {
         let meow = new Audio("audio/meow.wav");
+        let gameOverTemp = gameOver();
         meow.volume = 0.02;
         let meter = document.querySelector(".meter");
         player.girth = 0;
         meter.style.width = player.girth + "%";
         meter.style.boxShadow = "0px 0px 0px 0px rgba(0, 106, 255, 0.5)";
         meow.play();
-        gameOver();
+        gameOverTemp;
+        gameOverTemp = null;
         meter = null;
         meow = null;
         return;
@@ -303,23 +310,23 @@
         player.girth += game.birdGirthAmt;
 
         if (collision === false) {
-          let generate = generateBirds(1);
+          let generateBirdsTemp = generateBirds(1);
           collision = true;
           item.remove();
           delete game.birds[item.id];
           item = null;
-          generate;
-          generate = null;
+          generateBirdsTemp;
+          generateBirdsTemp = null;
         }
       } else if (item.y >= 700) {
         if (offScreen === false) {
-          let generate = generateBirds(1);
+          let generateBirdsTemp = generateBirds(1);
           offScreen = true;
           item.remove();
           delete game.birds[item.id];
           item = null;
-          generate;
-          generate = null;
+          generateBirdsTemp;
+          generateBirdsTemp = null;
         }
       }
     });
@@ -361,23 +368,23 @@
         player.girth -= game.fleaDamage;
 
         if (collision === false) {
-          let generate = generateFleas(1);
+          let generateFleasTemp = generateFleas(1);
           collision = true;
           item.remove();
           delete game.fleas[item.id];
           item = null;
-          generate;
-          generate = null;
+          generateFleasTemp;
+          generateFleasTemp = null;
         }
       } else if (item.y >= 700) {
         if (offScreen === false) {
-          let generate = generateFleas(1);
+          let generateFleasTemp = generateFleas(1);
           offScreen = true;
           item.remove();
           delete game.fleas[item.id];
           item = null;
-          generate;
-          generate = null;
+          generateFleasTemp;
+          generateFleasTemp = null;
         }
       }
     });
@@ -401,7 +408,7 @@
       )
     ) {
       let bark = new Audio("audio/bark.wav");
-      let generate = generateDog();
+      let generateDogTemp = generateDog();
       if (collision === false) {
         cat.classList.add("take-damage");
         setTimeout(() => {
@@ -414,26 +421,22 @@
         collision = true;
         player.girth -= game.dogDamage;
         dog.remove();
-        generate;
-        generate = null;
+        generateDogTemp;
+        generateDogTemp = null;
       }
     } else if (dog.x >= 500) {
       if (offScreen === false) {
-        let generate = generateDog();
+        let generateDogTemp = generateDog();
         offScreen = true;
         dog.remove();
-        game.dog = null;
-        generate;
-        generate = null;
+        generateDogTemp;
+        generateDogTemp = null;
       }
-      cat = null;
-      dog = null;
-      game.dog = null;
-      offScreen = null;
-      collision = null;
     }
 
     dog.style.left = dog.x + "px";
+    offScreen = null;
+    collision = null;
   };
 
   const generateLensFlare = () => {
