@@ -8,10 +8,10 @@
   const metrics = document.querySelector(".metrics");
   const thermal = new Audio("audio/thermal.wav");
 
-  // if (window.innerHeight < 730 || window.innerWidth < 1055) {
-  //   alert("This is a browser only game Sorry ;P");
-  //   return;
-  // }
+  if (window.innerHeight < 730 || window.innerWidth < 1055) {
+    alert("This is a browser only game Sorry ;P");
+    return;
+  }
 
   const player = {
     x: 20,
@@ -67,8 +67,6 @@
   };
 
   const startGame = () => {
-    let countdownTemp = countDown();
-    let hideStartMenuTemp = hideStartMenu();
     game.song[0].play();
     game.song[0].loop = true;
     game.song[0].volume = 0.03;
@@ -76,10 +74,8 @@
     cat.classList.add("cat");
     game.cat = cat;
     canvas.appendChild(cat);
-    countdownTemp;
-    countdownTemp = null;
-    hideStartMenuTemp;
-    hideStartMenuTemp = null;
+    countDown();
+    hideStartMenu();
     metrics.classList.remove("hidden");
     canvas.classList.remove("hidden");
 
@@ -137,38 +133,31 @@
   };
 
   const initializeGame = () => {
-    let requestTemp = window.requestAnimationFrame(playGame);
-    requestTemp;
-    requestTemp = null;
+    window.requestAnimationFrame(playGame);
   };
 
   const playGame = () => {
     let cat = game.cat;
-    let fleasTemp = moveFleas();
-    let birdsTemp = moveBirds();
-    let dogTemp = moveDog();
 
     if (player.gameStarted) {
       if (player.girth <= 0) {
         let meow = new Audio("audio/meow.wav");
-        let gameOverTemp = gameOver();
         meow.volume = 0.02;
         let meter = document.querySelector(".meter");
         player.girth = 0;
         meter.style.width = player.girth + "%";
         meter.style.boxShadow = "0px 0px 0px 0px rgba(0, 106, 255, 0.5)";
         meow.play();
-        gameOverTemp;
-        gameOverTemp = null;
+        gameOver();
         meter = null;
         meow = null;
         return;
       }
       decrementGirth();
-      fleasTemp;
-      birdsTemp;
+      moveFleas();
+      moveBirds();
       if (player.score >= 100) {
-        dogTemp;
+        moveDog();
       }
 
       incrementScore();
@@ -197,9 +186,6 @@
         canvasRect = null;
       }
     }
-    fleasTemp = null;
-    birdsTemp = null;
-    dogTemp = null;
     cat = null;
   };
 
@@ -310,23 +296,19 @@
         player.girth += game.birdGirthAmt;
 
         if (collision === false) {
-          let generateBirdsTemp = generateBirds(1);
           collision = true;
           item.remove();
           delete game.birds[item.id];
           item = null;
-          generateBirdsTemp;
-          generateBirdsTemp = null;
+          generateBirds(1);
         }
       } else if (item.y >= 700) {
         if (offScreen === false) {
-          let generateBirdsTemp = generateBirds(1);
           offScreen = true;
           item.remove();
           delete game.birds[item.id];
           item = null;
-          generateBirdsTemp;
-          generateBirdsTemp = null;
+          generateBirds(1);
         }
       }
     });
@@ -368,23 +350,19 @@
         player.girth -= game.fleaDamage;
 
         if (collision === false) {
-          let generateFleasTemp = generateFleas(1);
           collision = true;
           item.remove();
           delete game.fleas[item.id];
           item = null;
-          generateFleasTemp;
-          generateFleasTemp = null;
+          generateFleas(1);
         }
       } else if (item.y >= 700) {
         if (offScreen === false) {
-          let generateFleasTemp = generateFleas(1);
           offScreen = true;
           item.remove();
           delete game.fleas[item.id];
           item = null;
-          generateFleasTemp;
-          generateFleasTemp = null;
+          generateFleas(1);
         }
       }
     });
@@ -408,29 +386,24 @@
       )
     ) {
       let bark = new Audio("audio/bark.wav");
-      let generateDogTemp = generateDog();
       if (collision === false) {
         cat.classList.add("take-damage");
         setTimeout(() => {
           cat.classList.remove("take-damage");
         }, 400);
-
         bark.volume = 0.1;
         bark.play();
         bark = null;
         collision = true;
         player.girth -= game.dogDamage;
         dog.remove();
-        generateDogTemp;
-        generateDogTemp = null;
+        generateDog();
       }
     } else if (dog.x >= 500) {
       if (offScreen === false) {
-        let generateDogTemp = generateDog();
         offScreen = true;
         dog.remove();
-        generateDogTemp;
-        generateDogTemp = null;
+        generateDog();
       }
     }
 
